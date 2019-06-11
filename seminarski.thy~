@@ -221,10 +221,6 @@ primrec razlomak_proizvoda_suseda :: "nat \<Rightarrow> real" where
 
 value "razlomak_proizvoda_suseda 2"
 
-lemma sabiranje_razlomaka:
-  shows "a/b + c/b = (a+c)/b"
-  sorry
-
 lemma zbir_razlomka_proizvida_suseda: 
   fixes n::nat
   assumes "n \<ge> 1"
@@ -243,25 +239,5 @@ next
     also have "... = n/(n+1) + 1/((n+1)*(n+2))"
       using Suc
       by auto
-    also have "... =(n+2)/(n+2)* n/((n+1)) + 1/((n+1)*(n+2))"
-      by auto
-    also have "... =((n+2)*n)/((n+2)*(n+1)) + 1/((n+1)*(n+2))"
-      by (metis (no_types, lifting) divide_divide_eq_left of_nat_mult times_divide_eq_left)
-    also have "... =((n+2)*n)/((n+2)*(n+1)) + 1/((n+2)*(n+1))"
-      by auto
-    also have "... =(n*n+2*n)/((n+2)*(n+1)) + 1/((n+2)*(n+1))"
-      by auto  
-    also have "... =(n*n+2*n+1)/((n+2)*(n+1))"
-      using sabiranje_razlomaka
-      by (auto simp add: algebra_simps)     
     also have "... = (n^2 + 2*n + 1)/((n+1)*(n+2))"
-      by (auto simp add: algebra_simps power2_eq_square)
-    also have "... = (n+1)^2/((n+1)*(n+2))"
-      by (auto simp add: algebra_simps power2_eq_square)
-    also have "... = (n+1)/(n+2)"
-      by (smt Suc.hyps divide_divide_eq_right nonzero_mult_div_cancel_left of_nat_1 of_nat_add of_nat_mono of_nat_mult power2_eq_square)
-    finally show ?thesis by auto
-  qed
-qed
-
-end
+      sorry
