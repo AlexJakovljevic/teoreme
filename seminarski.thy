@@ -2,69 +2,88 @@ theory seminarski
   imports Complex_Main
 begin
 
-datatype 'a Maybe = Just 'a | Nothing
+primrec suma_prvih :: "nat \<Rightarrow> nat" where
+"suma_prvih 0 = 0"
+| "suma_prvih (Suc n) = suma_prvih n + (n+1)"
 
-definition testx :: "nat Maybe" where
-"testx = Just 4"
+lemma prvi_stepen:
+  shows "suma_prvih n = n*(n+1) div 2"
+proof (induction n)
+case 0
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "suma_prvih (Suc n) = suma_prvih n + (n+1)"
+      by simp
+    also have "... = n*(n+1) div 2 + (n+1)"
+      using Suc
+      by auto
+    also have "... = (n+1)*(n+2) div 2"
+      by auto
+    finally show ?thesis by auto
+  qed
+qed
 
-definition testy :: "nat Maybe" where
-"testy = Nothing"
+
+primrec suma_prvih_2 :: "nat \<Rightarrow> nat" where
+"suma_prvih_2 0 = 0"
+| "suma_prvih_2 (Suc n) = suma_prvih_2 n + (n+1)^2"
+
+lemma drugi_stepen:
+  shows "suma_prvih_2 n = n*(n+1)*(2*n+1) div 6"
+proof (induction n)
+case 0
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "suma_prvih_2 (Suc n) = suma_prvih_2 n + (n+1)^2"
+      by simp
+    also have "... = n*(n+1)*(2*n+1) div 6 + (n+1)^2"
+      using Suc
+      by auto
+    also have "... = (n+1)*(n+2)*(2*n+3) div 6"
+      by (auto simp add: power2_eq_square algebra_simps)
+    also have "... = (n+1)*(n+2)*(2*(n+1)+1) div 6"
+      by (auto simp add: algebra_simps)
+    finally show ?thesis by auto
+  qed
+qed
 
 
-primrec fmap :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a Maybe \<Rightarrow> 'b Maybe" where
-"fmap f Nothing = Nothing"
-| "fmap f (Just x) = Just (f x)" 
+primrec suma_prvih_3 :: "nat \<Rightarrow> nat" where
+"suma_prvih_3 0 = 0"
+| "suma_prvih_3 (Suc n) = suma_prvih_3 n + (n+1)^3"
 
-value "fmap (\<lambda>x. x+1) testx"
-value "fmap (\<lambda>x. x+1) testy"
+lemma treci_stepen:
+  shows "suma_prvih_3 n = n^2*(n+1)^2 div 4"
+proof (induction n)
+case 0
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "suma_prvih_3 (Suc n) = suma_prvih_3 n + (n+1)^3"
+      by simp
+    also have "... = n^2*(n+1)^2 div 4 + (n+1)^3"
+      using Suc
+      by auto
+    also have "... = n^2*(n+1)^2 div 4 + 4*(n+1)^3 div 4"
+      by auto
+    also have "... = (n+1)^2 *(n^2 + 4*(n+1)) div 4"
+      by (auto simp add: algebra_simps power3_eq_cube power2_eq_square)
+    also have "... = (n+1)^2 *(n+2)^2 div 4"
+      by (auto simp add: algebra_simps power2_eq_square)
+    finally show ?thesis by auto
+  qed
+qed
 
-primrec safe_head :: "'a list \<Rightarrow> 'a Maybe" where
-"safe_head [] = Nothing"
-| "safe_head (x#xs) = Just x"
-
-value "safe_head [1..<4]"
-value "safe_head [1..<0]"
-
-primrec from_maybe :: "'a \<Rightarrow> 'a Maybe \<Rightarrow> 'a" where
-"from_maybe x Nothing = x"
-| "from_maybe _ (Just x) = x"
-
-value "from_maybe 3 testy"
-value "from_maybe 3 testx"
-
-lemma "from_maybe y (fmap f Nothing) = y"
-  by auto
-
-lemma "from_maybe y (fmap f (Just x)) = f x"
-  by auto
-
-datatype Pair = MkPair "nat list" nat
-
-fun fst :: "Pair \<Rightarrow> nat list" where
-"fst (MkPair l _) = l"
-
-fun snd :: "Pair \<Rightarrow> nat" where
-"snd (MkPair _ x) = x"
-
-fun partition :: "nat list \<Rightarrow> Pair" where
-"partition (x # xs) = (let x1 =  (filter (\<lambda> y. y \<le> x) xs) in
- MkPair (x1 @ [x] @ (filter (\<lambda> y. y > x) xs)) (length x1))"
-
-(*
-fun quick_select :: "nat list \<Rightarrow> nat \<Rightarrow> nat" where
-"quick_select l k = (if k \<ge> length l then 0 else (
-  let p = partition l in
-  if k = snd p 
-    then (fst p ! k)
-  else (
-      if k < snd p
-      then (quick_select (take (snd p) (fst p)) k)
-    else
-      (quick_select (drop (snd p + 1) (fst p)) (k - snd p - 1))
-  )
-))"
-
-value "quick_select [1::nat, 2, 3,4] 3"
-*)
 
 end
