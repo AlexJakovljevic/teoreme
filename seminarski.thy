@@ -85,5 +85,47 @@ next
   qed
 qed
 
+lemma *: "(n+1)^3 = 2*(n+1)*(suma_prvih n) + (n+1)^2" 
+proof-
+  have "2*(n+1)*(suma_prvih n) + (n+1)^2 = 2*(n+1)*(n*(n+1) div 2) + (n+1)^2"
+    using prvi_stepen
+    by auto
+  also have "... = (n+1)*n*(n+1) + (n+1)^2"
+    by auto
+  also have "... = n*(n+1)^2 + (n+1)^2"
+    by (auto simp add: algebra_simps power2_eq_square)
+  also have "... = (n+1)^2*(n+1)"
+    by auto
+  also have "... = (n+1)^3"
+    by (auto simp add: algebra_simps power2_eq_square power3_eq_cube)
+  finally show ?thesis by auto
+qed
+
+lemma
+  shows "(suma_prvih n)^2 = suma_prvih_3 n"
+proof (induction n)
+case 0
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "(suma_prvih (Suc n))^2 = (suma_prvih n + (n+1))^2"
+      by simp
+    also have "... = (suma_prvih n)^2 + 2*(n+1)*(suma_prvih n) + (n+1)^2"
+      by (auto simp add: algebra_simps power2_eq_square)
+    also have "... =  suma_prvih_3 n +  2*(n+1)*(suma_prvih n) + (n+1)^2"
+      using Suc
+      by auto
+    also have "... = suma_prvih_3 n + (n+1)^3"
+      using *
+      by auto
+    also have "... = suma_prvih_3 (n+1)"
+      by auto
+    finally show ?thesis by auto
+  qed
+qed
+
 
 end
