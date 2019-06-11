@@ -127,5 +127,49 @@ next
   qed
 qed
 
+lemma[simp]: "2^(n+1) = 2*2^n"
+proof(induction n)
+  case 0
+  then show ?case
+    by simp
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "2^(Suc n + 1) = 2^(n + 2)"
+      by auto
+    also have "... = 2*2^(n+1)"
+      using Suc
+      by auto
+    finally show ?case by auto
+  qed
+qed
+
+lemma bernulli_inequality:
+  fixes n::nat
+  assumes "n >= 1" "a > -1"
+  shows "(1 + a)^n \<ge> 1 + n*a"
+  using assms
+proof (induction n rule: nat_induct_at_least)
+case base
+  then show ?case
+    by simp
+next
+case (Suc n)
+  have "1 + (Suc n)*a \<le> 1 + (Suc n)*a + n*a^2"
+    using `a >-1`
+    by auto
+  also have "... = 1 + n*a + a + n*a^2"
+    by simp
+  also have "... = (1+ n*a)*(1+a)"
+    by (auto simp add: algebra_simps power2_eq_square)
+  also have "... \<le> (1 + a)^(n) * (1 + a)"
+    using Suc
+    using mult_le_mono1 
+    by blast
+  also have "... = (1 + a)^(Suc n)"
+    by auto
+  finally show ?case .
+qed
 
 end
