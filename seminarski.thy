@@ -462,4 +462,110 @@ next
   finally show ?case by simp
 qed
 
+lemma n_n_kvadrat:
+  fixes n::nat
+  assumes "n\<ge>2"
+  shows "n < n^2"
+  using assms
+proof (induction n rule: nat_induct_at_least)
+  case base
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "Suc n = n+1"
+      by auto
+    also have "... < n^2 + 1"
+      using Suc
+      by auto
+    also have "... < n^2 + 1 + 2*n"
+      using Suc.hyps by linarith
+    also have "... = (n+1)^2"
+      by (auto simp add: power2_eq_square)
+    finally show ?thesis by auto
+  qed
+qed
+
+lemma
+  fixes n::nat
+  assumes "n \<ge> 3"
+  shows "4^(n-1) > n^2"
+  using assms
+proof (induction n rule: nat_induct_at_least)
+case base
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "(Suc n)^2 = n^2 + 2*n + 1"
+      by (auto simp add: power2_eq_square)
+    also  have "... = n^2 + n + n + 1"
+      by auto
+    also have "... < n^2 + n^2 + n +1"
+      using assms
+      by (metis Suc.hyps Suc_le_mono add_less_mono1 eval_nat_numeral(3) le_SucI n_n_kvadrat nat_add_left_cancel_less)
+    also have "... < n^2 + n^2 + n^2 +1"
+      using assms
+      by (metis Suc.hyps Suc_le_mono add_less_mono1 eval_nat_numeral(3) le_SucI n_n_kvadrat nat_add_left_cancel_less)
+    also have "... < n^2 + n^2 + n^2 +n"
+      using assms
+      using Suc.hyps by linarith
+    also have "... < n^2 + n^2 + n^2 +n^2"
+      using assms
+      by (metis Suc.hyps Suc_le_mono  eval_nat_numeral(3) le_SucI n_n_kvadrat nat_add_left_cancel_less)
+    also have "... = 4*n^2"
+      by auto
+    also have "... <4*4^(n-1)"
+      using Suc
+      by auto
+    also have "... = 4^n"
+      by (metis One_nat_def Suc_pred \<open>n\<^sup>2 + n\<^sup>2 + n\<^sup>2 + 1 < n\<^sup>2 + n\<^sup>2 + n\<^sup>2 + n\<close> add_Suc add_Suc_shift less_SucI nat_add_left_cancel_less power_Suc)
+    finally show ?thesis by auto
+  qed
+qed
+
+primrec zbir_stepena :: "nat \<Rightarrow> real \<Rightarrow> real" where
+"zbir_stepena 0 x = 1"
+|"zbir_stepena (Suc n) x = zbir_stepena n x + x^(n+1)"
+
+value "zbir_stepena 2 2"
+
+lemma
+  fixes x::real
+  fixes n::nat
+  assumes "x \<noteq> 1"
+  shows "zbir_stepena n x = (x^(n+1)-1)/(x-1)"
+  using assms
+proof (induction n)
+  case 0
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "zbir_stepena (Suc n) x = zbir_stepena n x + x^(n+1)"
+      by simp
+    also have "... =  (x^(n+1)-1)/(x-1) +  x^(n+1)"
+      using Suc
+      by auto
+    also have "... =  (x^(n+1)-1)/(x-1) + (x-1)*x^(n+1)/(x-1)"
+      using assms
+      by simp
+    also have "... = (x^(n+1)-1 +(x-1)*x^(n+1))/(x-1)"
+      using sabiranje_razlomaka by blast
+    also have "... = (x^(n+1)-1 + x*x^(n+1)-x^(n+1))/(x-1)"
+      by (auto simp add : field_simps)
+    also have "... = (-1 + x*x^(n+1))/(x-1)"
+      by auto
+    also have "... = (x^(n+2)-1)/(x-1)"
+      by auto
+    finally show ?thesis by auto
+  qed
+qed
+
 end
