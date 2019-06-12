@@ -221,11 +221,16 @@ primrec razlomak_proizvoda_suseda :: "nat \<Rightarrow> real" where
 
 value "razlomak_proizvoda_suseda 2"
 
-lemma sabiranje_razlomaka:
-  shows "a/b + c/b = (a+c)/b"
-  sorry
+thm add_divide_distrib
 
-lemma zbir_razlomka_proizvida_suseda: 
+lemma sabiranje_razlomaka:
+  fixes a::real
+  fixes b::real
+  fixes c::real
+  shows "a/b + c/b = (a+c)/b"
+  by (simp add: add_divide_distrib)
+
+lemma zbir_razlomka_proizvoda_suseda: 
   fixes n::nat
   assumes "n \<ge> 1"
   shows "razlomak_proizvoda_suseda n = real(n) div (n+1)"
@@ -262,6 +267,199 @@ next
       by (smt Suc.hyps divide_divide_eq_right nonzero_mult_div_cancel_left of_nat_1 of_nat_add of_nat_mono of_nat_mult power2_eq_square)
     finally show ?thesis by auto
   qed
+qed
+
+
+(* zadatak 4. *)
+
+lemma deljivost_sa_19: 
+  "(19::nat) dvd 7 * 5^(2*n) + 12 * 6 ^ n"
+proof(induction n)
+  case 0
+  thus ?case
+    by auto
+next
+  case (Suc n)
+  have "(7::nat) * 5 ^ (2 * Suc n) + 12 * 6 ^ (Suc n) = 7 * 25 * 5 ^ (2 * n) + 12 * 6 * 6 ^ n"
+    using [[show_types]]
+    by auto
+  also have "... = 7 * 25 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n - 7 * 5 ^(2*n))"
+    by auto
+  also have "... = 7 * 25 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n) - 6 * 7 * 5 ^(2*n)"
+    by auto
+  also have "... = 19 * 7 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n)"
+    by auto
+  finally show ?case
+    by (smt Suc.IH dvd_add_left_iff dvd_trans dvd_triv_right mult.commute)
+qed
+
+(* 5. zadatak *)
+
+primrec cetiri_n_minus_1 :: "nat \<Rightarrow> nat" where
+  "cetiri_n_minus_1 0 = 1"
+| "cetiri_n_minus_1 (Suc n) = (4*(Suc n) - 1) * cetiri_n_minus_1 n"
+
+value "cetiri_n_minus_1 2"
+
+primrec cetiri_n_plus_1 :: "nat \<Rightarrow> nat" where
+  "cetiri_n_plus_1 0 = 1"
+| "cetiri_n_plus_1 (Suc n) = (4*(Suc n) + 1) * cetiri_n_plus_1 n"
+
+
+lemma poredjenje_razlomaka:
+  fixes a::real
+  fixes b::real
+  fixes c::real
+  assumes "a > c" "a > 0" "b > 0"
+  shows "sqrt(a/b) > sqrt(c/b)"
+  using assms
+  by (simp add: divide_strict_right_mono)
+
+
+(*Opet slabo radi sa razlomcima. Ova lema iznad je iskoriscena i radi deo posla.*)
+lemma
+  fixes n::nat
+  assumes "n \<ge> 1"
+  shows "real(cetiri_n_minus_1 n)^2 < (3::real) * real(cetiri_n_plus_1 n)^2 / real(4*n + 3)"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  thus ?case
+    by auto
+next
+  case (Suc n)
+  thus ?case
+  (*
+  have "real(cetiri_n_minus_1 (Suc n))^2 / real(cetiri_n_plus_1 (Suc n))^2 =
+       (real(cetiri_n_minus_1 n)^2 * ((4*(Suc n) - 1))^2) / (real(cetiri_n_plus_1 n)^2 * ((4*(Suc n) +1))^2)"
+    by (auto simp add: algebra_simps power2_eq_square)
+  also have "... < (3::real) / real(4 *n + 3) * (4*n + 3)^2/(4*n + 5)^2"
+    using Suc
+    using poredjenje_razlomaka
+    by (auto simp add: algebra_simps power2_eq_square)
+  *)
+  (*
+  have " (3::real) / (4*n + 7) > (1::real) / (4*n + 7)"
+    using poredjenje_razlomaka
+    by auto
+  also have "... > (4 * n + 3) / (4*n + 5)^2"
+  *)
+  sorry
+qed
+
+(* primer 5. *)
+
+primrec faktorijel :: "nat \<Rightarrow> nat" where
+  "faktorijel 0 = 1"
+| "faktorijel (Suc n) = Suc n * faktorijel n"
+
+lemma fact2_veci_2naN:
+  fixes n::nat
+  assumes "n \<ge> 4"
+  shows "faktorijel n > (2::nat)^n"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  thus ?case
+    by (simp add: numeral.simps(2))
+next
+  case (Suc n)
+  have "2^(Suc n) = 2 * 2^n"
+    by simp
+  also have "... < (Suc n) * 2^n"
+    using Suc 
+    by auto
+  also have "... \<le> (Suc n) * faktorijel n"
+    using Suc less_imp_le_nat mult_le_mono2
+    by blast
+  also have "... = faktorijel (n + 1)"
+    by auto
+  finally show ?case by simp
+qed
+
+(* primer 6 *)
+(* ovo je kao slozeniji primer gde se koristi cinjenica da 12 i 7 dele, 
+otuda deli i 84. Ako hoces, mozes probati da ga uradis. 
+Meni je islo dok nije poceo da baguje u drugom delu. *)
+lemma deljivost_sa_84:
+  assumes "n \<ge> 1"
+  shows "(84::nat) dvd 4^(2*n) - 3^(2*n) - 7"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  thus ?case
+ (* ovo prolazi  have "nat(4)^(2*Suc n) - 3 ^(2 * Suc n) - 7 = 4^2 * 4 ^(2*n) - 3^2 * 3 ^(2*n) - 7"
+                  by auto*)
+  sorry
+qed
+
+(* zadatak 6. *)
+(* Dokazati da vazi 2^n > n^2 za n \<ge> 5*)
+
+lemma pomocna_2_dva_na_stepen_n_na_kvadrat:
+  fixes n::nat
+  assumes "n \<ge> 5"
+  shows "(n - 1)^2 > 2"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  then show ?case by auto
+next
+  case (Suc n)
+  have "(Suc n - 1)^2 = n^2"
+    by simp
+  also have "... > 2"
+    using assms calculation Suc
+    by (auto simp add: algebra_simps power2_eq_square)
+  finally show ?case
+    by auto
+qed
+
+lemma pomocna_1_dva_na_stepen_n_na_kvadrat:
+  fixes n::nat
+  assumes "n \<ge> 5"
+  shows "n^2 > 2*n + 1"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  then show ?case by simp
+next
+  case (Suc n)
+    have *:"(Suc n)^2 = n^2 + 2*n + 1"
+      by (simp add: power2_eq_square)
+    also have "... > 2*(n + 1) + 1 "
+      using assms Suc 
+      by auto
+    finally show ?case
+      by simp 
+qed
+
+lemma dva_na_stepen_n_na_kvadrat:
+  fixes n::nat
+  assumes "n\<ge>5"
+  shows "2^n > n^2"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  have "(n + 1)^2 = n^2 + 2*n + 1"
+    by (simp add: power2_eq_square)
+  also have "... < 2*n^2"
+    using pomocna_1_dva_na_stepen_n_na_kvadrat Suc
+    by auto
+  also have "... < 2*2^n"
+    using Suc
+    by auto
+  also have "... = 2^(n+1)"
+    by auto
+  finally show ?case by simp
 qed
 
 end
