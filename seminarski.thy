@@ -707,4 +707,72 @@ next
     by (metis Suc(1) add_leD1 not_one_le_zero numeral_3_eq_3 plus_1_eq_Suc power_eq_if)
   finally show ?case by simp
 qed
+
+
+(* Knjiga Nejednakosti DMS strana 43 *)
+primrec suma_levo :: "nat \<Rightarrow> real" where
+"suma_levo 0 = 0"
+| "suma_levo (Suc n) = suma_levo n + 1/(1+2*n) + 1/(2+2*n) - 1/(1+n)"
+
+value "suma_levo 2"
+
+(* pomocna tvrdjenja *)
+lemma pom:
+  fixes n::nat
+  shows "1/(2*n+1) - 1/(2*n+2) \<ge> 0"
+  by (auto simp add : field_simps)
+
+lemma pom2:
+  fixes n::nat
+  shows "1/real(2*n+2) - 1/real(n+1) = - 1/real(2*n+2)"
+proof-
+  have "1/real(2*n+2) - 1/real(n+1) = 1/real(2*n+2)/((n+1)/(n+1)) - 1/real(n+1)"
+    by auto
+  also have "1/real(2*n+2) - 1/real(n+1) = 1*real(n+1)/(real(2*n+2)*(n+1)) - 1/real(n+1)"
+    by auto
+  also have "... = real(n+1)/(real(2*n+2)*(n+1)) - 1/real(n+1)/(real(2*n+2)/(2*n+2))"
+    by auto
+  also have  "... = real(n+1)/(real(2*n+2)*(n+1)) - real(2*n+2)/(real(n+1)*(2*n+2))"
+    by auto
+  also have  "... = real(n+1)/(real(n+1)*(2*n+2)) - real(2*n+2)/(real(n+1)*(2*n+2))"
+    by auto
+  also have "... =  (real(n+1)-real(2*n+2))/(real(n+1)*(2*n+2))"
+    by (smt sabiranje_razlomaka)
+  also have "... = -real(n+1)/(real(1+n)*real(2+2*n))"
+    by auto
+  also have "... = -1/real(2+2*n)"
+    using field_simps
+    by (smt \<open>1 / real (2 * n + 2) - 1 / real (n + 1) = 1 * real (n + 1) / (real (2 * n + 2) * real (n + 1)) - 1 / real (n + 1)\<close> divide_minus_left)
+  finally show ?thesis by auto
+qed
+
+(* tvrdjenje u zadatku *)
+lemma 
+  fixes n::nat
+  assumes "n\<ge>1"
+  shows "suma_levo n \<ge> 1/2"
+  using assms
+proof (induction n rule:nat_induct_at_least)
+case base
+  then show ?case
+    by auto
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "1/2 \<le> 1/2 + 1/(2*n+1) - 1/(2*n+2)"
+      using pom
+      by smt
+    also have "... =1/2 + 1/(2*n+1) + 1/(2*n+2) - 1/(n+1)"
+      using pom2
+      by auto
+    also have "... \<le> suma_levo n  + 1/(2*n+1) + 1/(2*n+2) - 1/(n+1)"
+      using Suc
+      by auto
+    also have "... = suma_levo (Suc n)"
+      by auto
+    finally show ?thesis by auto
+  qed
+qed
+
 end

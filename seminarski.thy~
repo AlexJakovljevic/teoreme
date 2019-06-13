@@ -315,6 +315,13 @@ lemma poredjenje_razlomaka:
   using assms
   by (simp add: divide_strict_right_mono)
 
+find_theorems "(_*_)^_ = _^_*_^_"
+
+find_theorems "_ < _ \<Longrightarrow> _/_ < _/_"
+
+find_theorems "_<_ \<Longrightarrow> _*_ < _*_"
+
+find_theorems "_^2 \<ge> 0"
 
 (*Opet slabo radi sa razlomcima. Ova lema iznad je iskoriscena i radi deo posla.*)
 lemma
@@ -328,8 +335,28 @@ proof(induction n rule: nat_induct_at_least)
     by auto
 next
   case (Suc n)
-  thus ?case
-  (*
+  then show ?case
+    sorry
+(*
+  proof-
+ have "real(cetiri_n_minus_1 (Suc n))^2 / real(cetiri_n_plus_1 (Suc n))^2 =
+       real((4*(Suc n) - 1) * cetiri_n_minus_1 n)^2 / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+   by auto
+  also have "... = real((4*(Suc n) - 1)^2 * (cetiri_n_minus_1 n)^2) / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+    by (auto simp add:power_mult_distrib)
+  also have "... = real((4*(Suc n) - 1)^2) * real((cetiri_n_minus_1 n))^2 / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+    by auto
+  also have "... < real((4*(Suc n) - 1)^2) * ((3::real) * real(cetiri_n_plus_1 n)^2 / real(4*n + 3)) / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+    using Suc
+     using  zero_le_power2
+    using divide_strict_right_mono
+    using mult_strict_left_mono
+    sledgehammer
+    by (smt One_nat_def Suc_pred add_is_0 divide_eq_0_iff mult_eq_0_iff of_nat_0_less_iff of_nat_le_0_iff one_eq_mult_iff one_less_numeral_iff power2_eq_square rel_simps(9) zero_less_Suc zero_less_diff)
+
+ qed
+*)
+(*
   have "real(cetiri_n_minus_1 (Suc n))^2 / real(cetiri_n_plus_1 (Suc n))^2 =
        (real(cetiri_n_minus_1 n)^2 * ((4*(Suc n) - 1))^2) / (real(cetiri_n_plus_1 n)^2 * ((4*(Suc n) +1))^2)"
     by (auto simp add: algebra_simps power2_eq_square)
@@ -344,7 +371,7 @@ next
     by auto
   also have "... > (4 * n + 3) / (4*n + 5)^2"
   *)
-  sorry
+  
 qed
 
 (* primer 5. *)
@@ -635,20 +662,27 @@ primrec n_na_m :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
   "n_na_m n 0 = n"
 | "n_na_m n (Suc m) = n + n_na_m n m" 
 
-(* Probaj da dokazes ovo, jer koristim u teoremi ispod *)
+
+thm power_decreasing
+thm power_Suc
+thm power_Suc2
+thm power_Suc_le_self
+thm power_add
+thm power_Suc_less_one
+thm power_add_numeral
+thm power_dict
+thm power_diff
+
+find_theorems "_ < _ \<Longrightarrow> _^_ < _^_"
+thm power_less_imp_less_base
+thm power_strict_mono
+
 lemma n_faktorijel_n_n_minus_jedan_pomocna:
   fixes n::nat
-  assumes "n \<ge> 3"
+  assumes "n \<ge> 2"
   shows "(n+1)^(n-1) > n^(n-1)"
   using assms
-proof(induction n rule: nat_induct_at_least)
-  case base
-  then show ?case
-    by simp
-next
-  case (Suc n)
-  then show ?case sorry
-qed
+  by (auto simp add:power_strict_mono)
 
 lemma n_faktorijel_n_n_minus_jedan:
   fixes n::nat
@@ -666,9 +700,9 @@ next
   also have "... < (n + 1) * n^(n - 1)"
     using Suc Suc_mult_less_cancel1
     by auto
-  also have "... \<le> (n + 1)*(n + 1)^(n - 1)"
+  also have "... \<le> (n + 1)*(n + 1)^(n - 1)"  
     using Suc n_faktorijel_n_n_minus_jedan_pomocna
-    by (metis Suc_mult_less_cancel1 add.commute less_imp_le_nat plus_1_eq_Suc)
+    by (metis Suc_eq_plus1 Suc_mult_less_cancel1 add.commute eval_nat_numeral(3) le_SucI less_imp_le_nat nat_add_left_cancel_le)
   also have "... = (n + 1)^n"
     by (metis Suc(1) add_leD1 not_one_le_zero numeral_3_eq_3 plus_1_eq_Suc power_eq_if)
   finally show ?case by simp
