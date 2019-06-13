@@ -315,6 +315,13 @@ lemma poredjenje_razlomaka:
   using assms
   by (simp add: divide_strict_right_mono)
 
+find_theorems "(_*_)^_ = _^_*_^_"
+
+find_theorems "_ < _ \<Longrightarrow> _/_ < _/_"
+
+find_theorems "_<_ \<Longrightarrow> _*_ < _*_"
+
+find_theorems "_^2 \<ge> 0"
 
 (*Opet slabo radi sa razlomcima. Ova lema iznad je iskoriscena i radi deo posla.*)
 lemma
@@ -328,8 +335,28 @@ proof(induction n rule: nat_induct_at_least)
     by auto
 next
   case (Suc n)
-  thus ?case
-  (*
+  then show ?case
+    sorry
+(*
+  proof-
+ have "real(cetiri_n_minus_1 (Suc n))^2 / real(cetiri_n_plus_1 (Suc n))^2 =
+       real((4*(Suc n) - 1) * cetiri_n_minus_1 n)^2 / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+   by auto
+  also have "... = real((4*(Suc n) - 1)^2 * (cetiri_n_minus_1 n)^2) / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+    by (auto simp add:power_mult_distrib)
+  also have "... = real((4*(Suc n) - 1)^2) * real((cetiri_n_minus_1 n))^2 / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+    by auto
+  also have "... < real((4*(Suc n) - 1)^2) * ((3::real) * real(cetiri_n_plus_1 n)^2 / real(4*n + 3)) / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
+    using Suc
+     using  zero_le_power2
+    using divide_strict_right_mono
+    using mult_strict_left_mono
+    sledgehammer
+    by (smt One_nat_def Suc_pred add_is_0 divide_eq_0_iff mult_eq_0_iff of_nat_0_less_iff of_nat_le_0_iff one_eq_mult_iff one_less_numeral_iff power2_eq_square rel_simps(9) zero_less_Suc zero_less_diff)
+
+ qed
+*)
+(*
   have "real(cetiri_n_minus_1 (Suc n))^2 / real(cetiri_n_plus_1 (Suc n))^2 =
        (real(cetiri_n_minus_1 n)^2 * ((4*(Suc n) - 1))^2) / (real(cetiri_n_plus_1 n)^2 * ((4*(Suc n) +1))^2)"
     by (auto simp add: algebra_simps power2_eq_square)
@@ -344,7 +371,7 @@ next
     by auto
   also have "... > (4 * n + 3) / (4*n + 5)^2"
   *)
-  sorry
+  
 qed
 
 (* primer 5. *)
