@@ -775,4 +775,95 @@ next
   qed
 qed
 
+(* Zadatak 16. b)*)
+(*
+primrec proizvod_zad16 :: "nat \<Rightarrow> real" where
+  "proizvod_zad16 0 = 1"
+| "proizvod_zad16 (Suc n) = proizvod_zad16 n * ( 1 - 4/(2*n + 1)^2) "
+
+lemma prosirivanje_razlomka_zad16:
+  fixes b::real
+  fixes c::real
+  assumes "b \<noteq> 0"
+  shows "1 - c/b = b/b - c/b"
+  using assms
+  by (simp add: diff_divide_distrib)
+
+
+lemma oduzimanje_razlomka:
+  fixes a b c::nat
+  assumes "b \<noteq> 0"
+  shows "a/b - c/b = (real(a) - (c))/b"
+  using assms
+  by (simp add: diff_divide_distrib)
+
+value "proizvod_zad16 2"
+lemma proizvod_zad16_lm:
+  fixes n::nat
+  assumes "n \<ge> 1"
+  shows "proizvod_zad16 n = (1 + 2*n)/(1 - 2*n)"
+proof(induction n)
+  case 0
+  thus ?case by simp
+next
+  case (Suc n)
+  have "proizvod_zad16 (Suc n) = proizvod_zad16 n * ( 1 - 4/(2*n + 1)^2)"
+    by auto
+  also have "... = proizvod_zad16 n * (1 - 4/(4*n^2 + 4*n +1))"
+    by (auto simp add: power2_eq_square)
+  also have "... = proizvod_zad16 n * ((4*n^2 + 4*n +1)/(4*n^2 + 4*n +1) - 4/(4*n^2 + 4*n +1))"
+    by (metis Suc_eq_plus1 Suc_mult_cancel1 add_diff_cancel_left' diff_zero mult.commute
+        mult_zero_right n_not_Suc_n nat_mult_1 of_nat_eq_0_iff  prosirivanje_razlomka_zad16)
+  also have "... = proizvod_zad16 n * ((4*n^2 + 4*n + 1) - real(4))/(4*n^2 + 4*n +1)"
+    using oduzimanje_razlomka Suc
+    by (metis (mono_tags, hide_lams) Suc_1 Suc_eq_plus1
+        diff_divide_distrib distrib_left of_nat_numeral 
+        semiring_normalization_rules(24) times_divide_eq_right)
+  also have "... =  proizvod_zad16 n * ((4*n^2 + 4*n - nat(3))/(4*n^2 + 4*n +1))"
+    using Suc assms
+    sledgehammer
+    by auto
+  qed
+*)
+
+(*
+(* da se brojevi oblika 2^2^n + 1 (n = 2, 3 , . . . ) završavaju cifrom 7 *)
+find_theorems "_ dvd _ \<longrightarrow> _ dvd _"
+thm power2_eq_square
+
+lemma a_mod_b_n:
+  fixes a::nat
+  assumes "a \<ge> 2" "2^2^a mod (10::nat) = (6::nat)"
+  shows "2^2^a^2 mod 10 = (6::nat)"
+  sorry
+
+lemma mod_div_veza:
+  fixes a b c::nat
+  assumes "a mod b = c"
+  shows "b dvd (a - c)"
+  using assms
+  using dvd_minus_mod by blast
+
+lemma dva_na_dva_na_n_cifra:
+  fixes n::nat
+  assumes "n \<ge> 2"
+  shows " (2^2^n + 1) mod (10::nat) = (7::nat)"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  then show ?case by simp
+next
+  case (Suc n)
+  have "(2::nat)^2^(n+1) + 1 = 2^(2^n * 2) + 1"
+    by simp
+  also have*: "... = 2^2^n * 2^2^n + 1"
+    by (simp add: power2_eq_square power_mult)
+  also have "... = (2^2^n)^2 + 1"
+    using *
+    by (simp add: power_mult)
+  finally show ?case
+    using a_mod_b_n assms
+    sledgehammer
+  qed
+*)
 end
