@@ -400,25 +400,6 @@ qed
 (* zadatak 6. *)
 (* Dokazati da vazi 2^n > n^2 za n \<ge> 5*)
 
-lemma pomocna_2_dva_na_stepen_n_na_kvadrat:
-  fixes n::nat
-  assumes "n \<ge> 5"
-  shows "(n - 1)^2 > 2"
-  using assms
-proof(induction n rule: nat_induct_at_least)
-  case base
-  then show ?case by auto
-next
-  case (Suc n)
-  have "(Suc n - 1)^2 = n^2"
-    by simp
-  also have "... > 2"
-    using assms calculation Suc
-    by (auto simp add: algebra_simps power2_eq_square)
-  finally show ?case
-    by auto
-qed
-
 lemma pomocna_1_dva_na_stepen_n_na_kvadrat:
   fixes n::nat
   assumes "n \<ge> 5"
@@ -568,4 +549,128 @@ next
   qed
 qed
 
+(* zadatak 16. a) *)
+(* (1 - 1/4) * (1-1/9)*...*(1 - 1/n^2) = (n + 1)/2*n za n \<ge> 2 *)
+
+(* zadatak 18. a) *)
+
+lemma deljivost_sa_3:
+  fixes n::nat
+  shows "(3::nat) dvd 5^n + 2^(n+1)"
+proof(induction n)
+  case 0
+  thus ?case
+    by (simp add: numeral_3_eq_3)
+next
+  case (Suc n)
+  have "5^(Suc n) + 2^(Suc n + 1) = 5 * 5^n + 2*2^( n + 1)"
+      by simp
+    also have "... = (5::nat) * (5^n + 2^(n+1) - 2^(n+1)) + 2 * 2^(n + 1)"
+      using Suc
+      by simp
+    also have "... = 5 * (5^n + 2^(n+1)) - 5*2^(n+1) + 2 * 2^(n+1)"
+      by simp
+    also have "... = 5 * (5^n + 2^(n+1)) - 3*2^(n+1)"
+      by simp
+    finally show ?case
+      using Suc
+      by (auto simp only: dvdI dvd_diff_nat dvd_trans dvd_triv_right)
+qed
+(* zadatak 18. b) *)
+lemma deljivost_sa_59:
+  fixes n::nat
+  shows "(59::nat) dvd 5^(n+2) + 26 * 5^n + 8^(2*n+1)"
+proof (induction n)
+  case 0
+  thus ?case
+    by simp
+next
+  case (Suc n)
+  have "(5::nat)^(Suc n+2) + 26 * 5^(Suc n) + 8^(2*(Suc n)+1) =
+        5 * 5^(n + 2) + 26 * 5 * 5^n + 8^2 * 8^(2*n + 1)"
+    by simp
+  also have "... = 5 * 5^(n + 2) + 
+            5 *(5^(n+2) + 26 * 5^n + 8^(2*n+1) - 5^(n+2)- 8^(2*n+1))
+            + 8^2 * 8^(2*n + 1)"
+    by simp
+  also have "... = 5 * 5^(n + 2) + 5 *(5^(n+2) + 26 * 5^n + 8^(2*n+1)) -
+             5*5^(n+2)- 5*8^(2*n+1)
+            + 8^2 * 8^(2*n + 1)"
+    by simp
+  also have "... = 5 *(5^(n+2) + 26 * 5^n + 8^(2*n+1)) + 59* 8^(2*n+1)"
+    by simp
+  finally show ?case
+    using Suc
+    by (auto simp only: add_2_eq_Suc' dvd_add_left_iff dvd_triv_left dvd_triv_right gcd_nat.trans)
+qed
+(* zadatak 18. c) *)
+lemma deljivost_sa_133: 
+  fixes n::nat
+  shows "(133::nat) dvd 11^(n+2)+ 12^(2*n+1)"
+proof(induction n)
+  case 0
+  thus ?case
+    by simp
+next
+  case (Suc n)
+  have "(11::nat)^(Suc n + 2) + 12^(2*(Suc n) + 1) = 11 * 11^(n + 2) + 12^2 * 12^(2*n+1)"
+    by simp
+  also have "... = 11 * (11^(n+2)+ 12^(2*n+1) - 12^(2*n+1))+ 12^2 * 12^(2*n+1)"
+    by simp
+  also have "... = 11 * (11^(n+2)+ 12^(2*n+1)) + 133 * 12^(2*n+1)"
+    by simp
+  finally show ?case
+    using Suc
+    by (auto simp only: add_2_eq_Suc' dvd_add_left_iff dvd_triv_left dvd_triv_right gcd_nat.trans)
+qed
+
+(* zadatak 18. g) *)
+(* 11 | 30^n + 4^n * (3^n - 2^n) - 1 *)
+
+(* n! < n^(n-1) *)
+thm Suc_mult_less_cancel1
+thm power_eq_if
+
+primrec n_na_m :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
+  "n_na_m n 0 = n"
+| "n_na_m n (Suc m) = n + n_na_m n m" 
+
+(* Probaj da dokazes ovo, jer koristim u teoremi ispod *)
+lemma n_faktorijel_n_n_minus_jedan_pomocna:
+  fixes n::nat
+  assumes "n \<ge> 3"
+  shows "(n+1)^(n-1) > n^(n-1)"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  then show ?case
+    by simp
+next
+  case (Suc n)
+  then show ?case sorry
+qed
+
+lemma n_faktorijel_n_n_minus_jedan:
+  fixes n::nat
+  assumes "n \<ge> 3"
+  shows "faktorijel n < n^(n-1)"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  then show ?case
+    by (simp add: numeral_3_eq_3)
+next
+  case (Suc n)
+  have "faktorijel (Suc n) = Suc n * faktorijel n"
+    by (simp only: faktorijel.simps(2))
+  also have "... < (n + 1) * n^(n - 1)"
+    using Suc Suc_mult_less_cancel1
+    by auto
+  also have "... \<le> (n + 1)*(n + 1)^(n - 1)"
+    using Suc n_faktorijel_n_n_minus_jedan_pomocna
+    by (metis Suc_mult_less_cancel1 add.commute less_imp_le_nat plus_1_eq_Suc)
+  also have "... = (n + 1)^n"
+    by (metis Suc(1) add_leD1 not_one_le_zero numeral_3_eq_3 plus_1_eq_Suc power_eq_if)
+  finally show ?case by simp
+qed
 end

@@ -635,20 +635,27 @@ primrec n_na_m :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
   "n_na_m n 0 = n"
 | "n_na_m n (Suc m) = n + n_na_m n m" 
 
-(* Probaj da dokazes ovo, jer koristim u teoremi ispod *)
+
+thm power_decreasing
+thm power_Suc
+thm power_Suc2
+thm power_Suc_le_self
+thm power_add
+thm power_Suc_less_one
+thm power_add_numeral
+thm power_dict
+thm power_diff
+
+find_theorems "_ < _ \<Longrightarrow> _^_ < _^_"
+thm power_less_imp_less_base
+thm power_strict_mono
+
 lemma n_faktorijel_n_n_minus_jedan_pomocna:
   fixes n::nat
-  assumes "n \<ge> 3"
+  assumes "n \<ge> 2"
   shows "(n+1)^(n-1) > n^(n-1)"
   using assms
-proof(induction n rule: nat_induct_at_least)
-  case base
-  then show ?case
-    by simp
-next
-  case (Suc n)
-  then show ?case sorry
-qed
+  by (auto simp add:power_strict_mono)
 
 lemma n_faktorijel_n_n_minus_jedan:
   fixes n::nat
@@ -666,9 +673,9 @@ next
   also have "... < (n + 1) * n^(n - 1)"
     using Suc Suc_mult_less_cancel1
     by auto
-  also have "... \<le> (n + 1)*(n + 1)^(n - 1)"
+  also have "... \<le> (n + 1)*(n + 1)^(n - 1)"  
     using Suc n_faktorijel_n_n_minus_jedan_pomocna
-    by (metis Suc_mult_less_cancel1 add.commute less_imp_le_nat plus_1_eq_Suc)
+    by (metis Suc_eq_plus1 Suc_mult_less_cancel1 add.commute eval_nat_numeral(3) le_SucI less_imp_le_nat nat_add_left_cancel_le)
   also have "... = (n + 1)^n"
     by (metis Suc(1) add_leD1 not_one_le_zero numeral_3_eq_3 plus_1_eq_Suc power_eq_if)
   finally show ?case by simp
