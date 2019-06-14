@@ -172,46 +172,6 @@ case (Suc n)
   finally show ?case .
 qed
 
-(* Dokazati da je broj f(n) = 2^(n+1) + 3^(2*n-1) 
- deljiv sa 7 za sve prirodne brojeve. *)
-(* Zadatak je Primer 2. iz knjige Analiza sa algebrom 2 
- i u knjizi se javlja greska u dokazu.*)
-
-lemma pomocna_deljivost_sa_7:
- assumes "n \<ge> 1"
- shows "(3::nat)^ (n * 2) = 3 * 3 ^ (n*2 - Suc 0)"
-  using [[show_types]]
-  using assms
-  by (induction n rule: nat_induct_at_least) auto
-
-lemma deljivost_sa_7:
-  fixes n::nat
-  assumes "n \<ge> 1" 
-  shows "(7::nat) dvd 2^(n+1) + 3^(2*n - 1)"
-  using assms
-proof(induction n rule: nat_induct_at_least)
-  case base
-  thus ?case 
-    by auto
-next
-  case (Suc n)
-  have "(2::nat)^(Suc n + 1) + (3::nat)^(2*(Suc n) - 1) = 2 ^ (n + 2) + 3 ^ (2*n +1)"
-    using [[show_types]]
-    by auto
-  also have "... = 2 * 2^(n + 1) + 3 * 3 * 3 ^(2*n - 1)"
-    using [[show_types]]
-    using pomocna_deljivost_sa_7
-    by (smt Groups.add_ac(2) Groups.mult_ac(1) 
-       One_nat_def Suc.hyps add_Suc_right mult.commute one_add_one plus_1_eq_Suc power_Suc)
-  also have "... = 2 * (2^(n+1) + 3^(2*n - 1) - 3^(2*n-1)) + 9 * 3 ^ (2*n - 1)"
-    by auto
-  also have "... = 2 * (2^(n+1) + 3^(2*n - 1)) - 2 * 3 ^ (2*n-1) + 9 * 3 ^(2*n-1)"
-    by auto
-  also have "... = 2 * (2^(n+1) + 3^(2*n - 1)) + 7 * 3 ^(2*n-1)"
-    by auto
-  finally show ?case
-    by (metis Suc.IH dvd_add dvd_add_times_triv_right_iff mult.commute mult_2)
-qed
 
 (* zadaci iz knjige *)
 (* zadatak 3 *)
@@ -270,28 +230,6 @@ next
 qed
 
 
-(* zadatak 4. *)
-
-lemma deljivost_sa_19: 
-  "(19::nat) dvd 7 * 5^(2*n) + 12 * 6 ^ n"
-proof(induction n)
-  case 0
-  thus ?case
-    by auto
-next
-  case (Suc n)
-  have "(7::nat) * 5 ^ (2 * Suc n) + 12 * 6 ^ (Suc n) = 7 * 25 * 5 ^ (2 * n) + 12 * 6 * 6 ^ n"
-    using [[show_types]]
-    by auto
-  also have "... = 7 * 25 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n - 7 * 5 ^(2*n))"
-    by auto
-  also have "... = 7 * 25 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n) - 6 * 7 * 5 ^(2*n)"
-    by auto
-  also have "... = 19 * 7 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n)"
-    by auto
-  finally show ?case
-    by (smt Suc.IH dvd_add_left_iff dvd_trans dvd_triv_right mult.commute)
-qed
 
 (* 5. zadatak *)
 
@@ -402,26 +340,6 @@ next
   also have "... = faktorijel (n + 1)"
     by auto
   finally show ?case by simp
-qed
-
-(* primer 6 *)
-(* ovo je kao slozeniji primer gde se koristi cinjenica da 12 i 7 dele, 
-otuda deli i 84. Ako hoces, mozes probati da ga uradis. 
-Meni je islo dok nije poceo da baguje u drugom delu. *)
-lemma deljivost_sa_84:
-  assumes "n \<ge> 1"
-  shows "(84::nat) dvd 4^(2*n) - 3^(2*n) - 7"
-  using assms
-proof(induction n rule: nat_induct_at_least)
-  case base
-  then show ?case
-    by auto
-next
-  case (Suc n)
-  thus ?case
- (* ovo prolazi  have "nat(4)^(2*Suc n) - 3 ^(2 * Suc n) - 7 = 4^2 * 4 ^(2*n) - 3^2 * 3 ^(2*n) - 7"
-                  by auto*)
-  sorry
 qed
 
 (* zadatak 6. *)
@@ -578,6 +496,71 @@ qed
 
 (* zadatak 16. a) *)
 (* (1 - 1/4) * (1-1/9)*...*(1 - 1/n^2) = (n + 1)/2*n za n \<ge> 2 *)
+
+(* zadatak 4. *)
+
+lemma deljivost_sa_19: 
+  "(19::nat) dvd 7 * 5^(2*n) + 12 * 6 ^ n"
+proof(induction n)
+  case 0
+  thus ?case
+    by auto
+next
+  case (Suc n)
+  have "(7::nat) * 5 ^ (2 * Suc n) + 12 * 6 ^ (Suc n) = 7 * 25 * 5 ^ (2 * n) + 12 * 6 * 6 ^ n"
+    using [[show_types]]
+    by auto
+  also have "... = 7 * 25 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n - 7 * 5 ^(2*n))"
+    by auto
+  also have "... = 7 * 25 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n) - 6 * 7 * 5 ^(2*n)"
+    by auto
+  also have "... = 19 * 7 * 5 ^ (2 * n) + 6 * (7 * 5^(2*n) + 12 * 6 ^ n)"
+    by auto
+  finally show ?case
+    by (smt Suc.IH dvd_add_left_iff dvd_trans dvd_triv_right mult.commute)
+qed
+
+(* Dokazati da je broj f(n) = 2^(n+1) + 3^(2*n-1)
+ deljiv sa 7 za sve prirodne brojeve. *)
+(* Zadatak je Primer 2. iz knjige Analiza sa algebrom 2 
+ i u knjizi se javlja greska u dokazu.*)
+
+
+lemma pomocna_deljivost_sa_7:
+ assumes "n \<ge> 1"
+ shows "(3::nat)^ (n * 2) = 3 * 3 ^ (n*2 - Suc 0)"
+  using [[show_types]]
+  using assms
+  by (induction n rule: nat_induct_at_least) auto
+
+lemma deljivost_sa_7:
+  fixes n::nat
+  assumes "n \<ge> 1" 
+  shows "(7::nat) dvd 2^(n+1) + 3^(2*n - 1)"
+  using assms
+proof(induction n rule: nat_induct_at_least)
+  case base
+  thus ?case 
+    by auto
+next
+  case (Suc n)
+  have "(2::nat)^(Suc n + 1) + (3::nat)^(2*(Suc n) - 1) = 2 ^ (n + 2) + 3 ^ (2*n +1)"
+    using [[show_types]]
+    by auto
+  also have "... = 2 * 2^(n + 1) + 3 * 3 * 3 ^(2*n - 1)"
+    using [[show_types]]
+    using pomocna_deljivost_sa_7
+    by (smt Groups.add_ac(2) Groups.mult_ac(1) 
+       One_nat_def Suc.hyps add_Suc_right mult.commute one_add_one plus_1_eq_Suc power_Suc)
+  also have "... = 2 * (2^(n+1) + 3^(2*n - 1) - 3^(2*n-1)) + 9 * 3 ^ (2*n - 1)"
+    by auto
+  also have "... = 2 * (2^(n+1) + 3^(2*n - 1)) - 2 * 3 ^ (2*n-1) + 9 * 3 ^(2*n-1)"
+    by auto
+  also have "... = 2 * (2^(n+1) + 3^(2*n - 1)) + 7 * 3 ^(2*n-1)"
+    by auto
+  finally show ?case
+    by (metis Suc.IH dvd_add dvd_add_times_triv_right_iff mult.commute mult_2)
+qed
 
 (* zadatak 18. a) *)
 
@@ -844,14 +827,14 @@ next
   proof-
   have "(2::nat)^2^(n+1) mod (10::nat) = 2^(2^n * 2) mod (10::nat)"
     by (metis power_add power_one_right)
-  also have*: "... = 2^2^n * 2^2^n mod (10::nat)"
+  also have "... = 2^2^n * 2^2^n mod (10::nat)"
     by (simp add: power2_eq_square power_mult)
-  also have "...  =  (2^2^n mod (10::nat) *  2^2^n mod (10::nat)) mod (10::nat)"
+  also have *:"...  =  (2^2^n mod (10::nat) *  2^2^n mod (10::nat)) mod (10::nat)"
     using mod_mult_left_eq
     by (simp add: mod_mult_left_eq)
   also have "... = ((6::nat)*(6::nat)) mod (10::nat)"
-    using Suc
-    by (metis \<open>2 ^ 2 ^ n * 2 ^ 2 ^ n mod 10 = 2 ^ 2 ^ n mod 10 * 2 ^ 2 ^ n mod 10 mod 10\<close> mod_mult_eq)
+    using Suc *
+    by (metis mod_mult_eq)
   also have "... = 6"
     by auto
   finally show ?thesis by auto
@@ -866,5 +849,62 @@ lemma dva_na_dva_na_n_plus_jedan_cifra:
   using assms
   using dva_na_dva_na_n_cifra
   by (metis Suc3_eq_add_3 Suc_1 add_Suc_right mod_add_left_eq mod_less nat_add_left_cancel_less numeral_Bit0 numeral_nat(3) one_less_numeral_iff plus_nat.simps(2) semiring_norm(76))
+
+
+(* da se brojevi oblika 2^4^n (n = 1, 2 , . . . ) završavaju cifrom 6 *)
+
+lemma dva_na_cetiri_na_n_cifra_pomocna:
+  fixes n::nat
+  assumes "n \<ge> 1"
+  shows " 2^2^(2*n) mod (10::nat) = (6::nat)"
+  using assms dva_na_dva_na_n_cifra
+  by simp
+
+lemma dva_na_cetiri_na_n_cifra_pomocna2: 
+  "2^4^n = 2^(2^(2*n))"
+  by (smt Suc_1 mult_2 numeral_Bit0 one_power2 plus_1_eq_Suc power2_sum power_mult)
+
+lemma dva_na_cetiri_na_n_cifra:
+  fixes n::nat
+  assumes "n \<ge> 1"
+  shows " 2^4^n mod (10::nat) = (6::nat)"
+  using assms dva_na_cetiri_na_n_cifra_pomocna
+  by (simp add: dva_na_cetiri_na_n_cifra_pomocna2)
+
+(* Neke nasumicne leme *)
+
+lemma mod_distrib_plus:
+  fixes a b c :: int  
+  shows "(a + b) mod c = (a mod c + b mod c) mod c"
+  by (simp add: mod_add_eq)
+
+lemma mod_distrib_sub:
+  fixes a b ::int
+  fixes c :: nat
+  shows "(a - b) mod c = (a mod c - b mod c) mod c"
+  by (simp add: mod_diff_eq)
+
+lemma mod_distrib_diff:
+  fixes a b c d m :: int
+  assumes "a mod m = b" "c mod m = d"
+  shows "(a - c) mod m = (b - d) mod m"
+  using assms
+  by (metis mod_diff_cong mod_mod_trivial)
+
+
+lemma mod_distrib_add:
+  fixes a b c d m :: int
+  assumes "a mod m = b" "c mod m = d"
+  shows "(a + c) mod m = (b + d) mod m"
+  using assms
+  by (metis mod_add_cong mod_add_left_eq mod_mod_trivial)
+
+
+lemma mod_distrib_prod:
+  fixes a b c d m :: int
+  assumes "a mod m = b" "c mod m = d"
+  shows "(a * c) mod m = (b * d) mod m"
+  using assms
+  by (auto simp add: mod_mult_eq)
 
 end
