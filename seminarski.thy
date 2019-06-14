@@ -775,6 +775,7 @@ next
   qed
 qed
 
+
 (* Zadatak 16. b)*)
 (*
 primrec proizvod_zad16 :: "nat \<Rightarrow> real" where
@@ -826,44 +827,44 @@ next
   qed
 *)
 
-(*
+
 (* da se brojevi oblika 2^2^n + 1 (n = 2, 3 , . . . ) završavaju cifrom 7 *)
-find_theorems "_ dvd _ \<longrightarrow> _ dvd _"
-thm power2_eq_square
-
-lemma a_mod_b_n:
-  fixes a::nat
-  assumes "a \<ge> 2" "2^2^a mod (10::nat) = (6::nat)"
-  shows "2^2^a^2 mod 10 = (6::nat)"
-  sorry
-
-lemma mod_div_veza:
-  fixes a b c::nat
-  assumes "a mod b = c"
-  shows "b dvd (a - c)"
-  using assms
-  using dvd_minus_mod by blast
 
 lemma dva_na_dva_na_n_cifra:
   fixes n::nat
   assumes "n \<ge> 2"
-  shows " (2^2^n + 1) mod (10::nat) = (7::nat)"
+  shows " 2^2^n mod (10::nat) = (6::nat)"
   using assms
 proof(induction n rule: nat_induct_at_least)
   case base
   then show ?case by simp
 next
   case (Suc n)
-  have "(2::nat)^2^(n+1) + 1 = 2^(2^n * 2) + 1"
-    by simp
-  also have*: "... = 2^2^n * 2^2^n + 1"
+  then show ?case
+  proof-
+  have "(2::nat)^2^(n+1) mod (10::nat) = 2^(2^n * 2) mod (10::nat)"
+    by (metis power_add power_one_right)
+  also have*: "... = 2^2^n * 2^2^n mod (10::nat)"
     by (simp add: power2_eq_square power_mult)
-  also have "... = (2^2^n)^2 + 1"
-    using *
-    by (simp add: power_mult)
-  finally show ?case
-    using a_mod_b_n assms
-    sledgehammer
-  qed
-*)
+  also have "...  =  (2^2^n mod (10::nat) *  2^2^n mod (10::nat)) mod (10::nat)"
+    using mod_mult_left_eq
+    by (simp add: mod_mult_left_eq)
+  also have "... = ((6::nat)*(6::nat)) mod (10::nat)"
+    using Suc
+    by (metis \<open>2 ^ 2 ^ n * 2 ^ 2 ^ n mod 10 = 2 ^ 2 ^ n mod 10 * 2 ^ 2 ^ n mod 10 mod 10\<close> mod_mult_eq)
+  also have "... = 6"
+    by auto
+  finally show ?thesis by auto
+ qed
+qed
+
+
+lemma dva_na_dva_na_n_plus_jedan_cifra:
+  fixes n::nat
+  assumes "n \<ge> 2"
+  shows " (2^2^n + 1) mod (10::nat) = (7::nat)"
+  using assms
+  using dva_na_dva_na_n_cifra
+  by (metis Suc3_eq_add_3 Suc_1 add_Suc_right mod_add_left_eq mod_less nat_add_left_cancel_less numeral_Bit0 numeral_nat(3) one_less_numeral_iff plus_nat.simps(2) semiring_norm(76))
+
 end
