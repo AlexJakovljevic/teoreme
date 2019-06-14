@@ -871,7 +871,7 @@ lemma dva_na_cetiri_na_n_cifra:
   using assms dva_na_cetiri_na_n_cifra_pomocna
   by (simp add: dva_na_cetiri_na_n_cifra_pomocna2)
 
-(* Neke nasumicne leme *)
+(* Neke nasumicne leme iz kongruencije *)
 
 lemma mod_distrib_plus:
   fixes a b c :: int  
@@ -906,5 +906,99 @@ lemma mod_distrib_prod:
   shows "(a * c) mod m = (b * d) mod m"
   using assms
   by (auto simp add: mod_mult_eq)
+
+(*kongruencije krugova zbirka 3. god *)
+thm semiring_normalization_rules
+lemma dvanaest_na_n_mod_11:
+  fixes n::nat
+  shows "(12::nat)^n mod 11 = 1"
+proof(induction n)
+  case 0
+  then show ?case by simp
+next
+  case (Suc n)
+  have "(12::nat)^(Suc n) mod 11 = (12 * (12^n)) mod 11"
+    by simp
+  also have "... =( 12 mod 11 )* (12^n mod 11)"
+    by (metis Suc.IH mod_mult_right_eq mult.right_neutral)
+  also have "... = 1 * 1"
+    using Suc
+    by simp
+  finally show ?case by simp 
+qed
+
+lemma deljivost_sa_11:
+  fixes n::nat
+  shows "(12^n - 1) mod (11::nat) = (0::nat)"
+proof(induction n)
+  case 0
+then show ?case by simp
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "(12^(Suc n) - 1) mod (11::nat) = (12*12^n - 1) mod (11::nat)"
+      by simp
+    also have "... = (12*12^n) mod 11 - 1 mod 11"
+      by (metis One_nat_def add_diff_cancel_left' add_diff_cancel_right' calculation div_mult_mod_eq dvanaest_na_n_mod_11 
+           mod_mod_trivial mod_mult_self2_is_0 plus_1_eq_Suc power_Suc)
+    also have "... = 1 - 1"
+      by (metis dvanaest_na_n_mod_11 mod_mod_trivial power_Suc)
+    also have "... = 0"
+      by simp
+    finally show ?case by simp
+  qed
+qed
+
+
+lemma deset_na_3_n_mod_37:
+  fixes n ::nat
+  shows "10^(3*n) mod (37::nat) = 1"
+proof(induction n)
+case 0
+  then show ?case by simp
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "(10::nat)^(3*(Suc n)) mod (37::nat) = (10::nat)^(3*n + 3) mod (37::nat)"
+      by (simp add: semiring_normalization_rules(24))
+    also have "... = 10^3 * 10^(3*n) mod 37"
+      by (simp add: power_add semiring_normalization_rules(7))
+    also have "... = (10^3 mod 37) * 10^(3*n) mod 37"
+      by (metis mod_mult_left_eq)
+    also have "... = 1 * 1"
+      using Suc
+      by simp
+    finally show ?case by simp
+  qed
+qed
+
+lemma deljivost_sa_37:
+  fixes n::nat
+  shows "(10^(3*n) - 1) mod (37::nat) = 0" 
+proof(induction n)
+  case 0
+  then show ?case by simp
+next
+  case (Suc n)
+  then show ?case
+  proof-
+    have "((10::nat)^(3*(Suc n)) - 1) mod (37::nat) = (10^(3*(n+1)) - 1) mod (37::nat)"
+      by simp
+    also have "... = (10^(3*n+3) - 1) mod (37::nat)"
+      by (simp add: semiring_normalization_rules(24))
+    also have "... = (10^3 * 10^(3*n) - 1) mod (37::nat)"
+      by (simp add: power_add semiring_normalization_rules(24))
+    also have "... = (10^3 * 10^(3*n)) mod (37::nat) - 1 mod (37::nat)"
+      by (metis (no_types, lifting) One_nat_def  add_diff_cancel_left' add_diff_cancel_right' 
+          deset_na_3_n_mod_37 div_mult_mod_eq mod_mod_trivial mod_mult_self2_is_0 mult_Suc_right 
+          plus_1_eq_Suc power_add)   
+    also have "... = 1 - 1"
+      using Suc
+      by (metis deset_na_3_n_mod_37 mod_mod_trivial mult_Suc_right power_add)
+    finally show ?case by simp
+  qed
+qed
 
 end
