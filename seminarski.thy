@@ -85,6 +85,7 @@ next
   qed
 qed
 
+
 lemma *: "(n+1)^3 = 2*(n+1)*(suma_prvih n) + (n+1)^2" 
 proof-
   have "2*(n+1)*(suma_prvih n) + (n+1)^2 = 2*(n+1)*(n*(n+1) div 2) + (n+1)^2"
@@ -1000,5 +1001,53 @@ next
     finally show ?case by simp
   qed
 qed
+
+
+type_synonym mat2 = "int \<times> int \<times> int \<times> int"
+
+(* Mnozenje matrica dimenzije 2x2 *)
+fun mat_mul :: "mat2 \<Rightarrow> mat2 \<Rightarrow> mat2" where
+  "mat_mul (a1, b1, c1, d1) (a2, b2, c2, d2) = (a1*a2 + b1*c2, a1*b2 + b1*d2, c1*a2 + d1*c2, c1*b2 + d1*d2)"
+
+(* Jedinicna matrica *)
+definition eye :: mat2 where
+  "eye = (1, 0, 0, 1)"
+
+primrec mat_pow :: "mat2 \<Rightarrow> nat \<Rightarrow> mat2" where
+  "mat_pow A 0 = eye"
+| "mat_pow A (Suc n) = mat_mul A (mat_pow A n)"
+
+definition M :: mat2 where
+  "M = (-2, 9, -1, 4)"
+
+lemma "mat_pow M n = (1-3*n, 9*n, -n, 1+3*n)"
+proof (induction n)
+case 0
+  then show ?case
+   by (simp add: eye_def)
+next
+case (Suc n)
+  then show ?case
+  proof-
+    have "mat_pow M (Suc n) = mat_mul M (mat_pow M n)"
+      by simp
+    also have "... = mat_mul M (1-3*(n::int), 9*n, -n, 1+3*n)"
+      using Suc
+      by auto
+    also have "... = mat_mul (-2, 9, -1, 4) (1-3*(n::int), 9*n, -n, 1+3*n)"
+      unfolding M_def
+      by auto
+    also have "... = (-2+6*(n::int)-9*(n::int), -18*n+9+27*n, -1+3*n-4*n, -9*n+4+12*n)"
+      by auto
+    also have "... = (-2-3*(n::int), 9+9*n, -1-n, 4+3*n)"
+      by auto
+    also have "... = (1-3*((n::int)+1), 9*(n+1), -(n+1), 1+3*(n+1))"
+      by auto
+    finally show ?thesis by auto
+  qed
+qed
+
+
+
 
 end
