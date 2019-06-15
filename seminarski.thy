@@ -262,56 +262,6 @@ find_theorems "_<_ \<Longrightarrow> _*_ < _*_"
 
 find_theorems "_^2 \<ge> 0"
 
-(*Opet slabo radi sa razlomcima. Ova lema iznad je iskoriscena i radi deo posla.*)
-lemma
-  fixes n::nat
-  assumes "n \<ge> 1"
-  shows "real(cetiri_n_minus_1 n)^2 < (3::real) * real(cetiri_n_plus_1 n)^2 / real(4*n + 3)"
-  using assms
-proof(induction n rule: nat_induct_at_least)
-  case base
-  thus ?case
-    by auto
-next
-  case (Suc n)
-  then show ?case
-    sorry
-(*
-  proof-
- have "real(cetiri_n_minus_1 (Suc n))^2 / real(cetiri_n_plus_1 (Suc n))^2 =
-       real((4*(Suc n) - 1) * cetiri_n_minus_1 n)^2 / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
-   by auto
-  also have "... = real((4*(Suc n) - 1)^2 * (cetiri_n_minus_1 n)^2) / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
-    by (auto simp add:power_mult_distrib)
-  also have "... = real((4*(Suc n) - 1)^2) * real((cetiri_n_minus_1 n))^2 / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
-    by auto
-  also have "... < real((4*(Suc n) - 1)^2) * ((3::real) * real(cetiri_n_plus_1 n)^2 / real(4*n + 3)) / real((4*(Suc n) + 1) * cetiri_n_plus_1 n)^2"
-    using Suc
-     using  zero_le_power2
-    using divide_strict_right_mono
-    using mult_strict_left_mono
-    sledgehammer
-    by (smt One_nat_def Suc_pred add_is_0 divide_eq_0_iff mult_eq_0_iff of_nat_0_less_iff of_nat_le_0_iff one_eq_mult_iff one_less_numeral_iff power2_eq_square rel_simps(9) zero_less_Suc zero_less_diff)
-
- qed
-*)
-(*
-  have "real(cetiri_n_minus_1 (Suc n))^2 / real(cetiri_n_plus_1 (Suc n))^2 =
-       (real(cetiri_n_minus_1 n)^2 * ((4*(Suc n) - 1))^2) / (real(cetiri_n_plus_1 n)^2 * ((4*(Suc n) +1))^2)"
-    by (auto simp add: algebra_simps power2_eq_square)
-  also have "... < (3::real) / real(4 *n + 3) * (4*n + 3)^2/(4*n + 5)^2"
-    using Suc
-    using poredjenje_razlomaka
-    by (auto simp add: algebra_simps power2_eq_square)
-  *)
-  (*
-  have " (3::real) / (4*n + 7) > (1::real) / (4*n + 7)"
-    using poredjenje_razlomaka
-    by auto
-  also have "... > (4 * n + 3) / (4*n + 5)^2"
-  *)
-  
-qed
 
 (* primer 5. *)
 
@@ -758,58 +708,6 @@ next
     finally show ?thesis by auto
   qed
 qed
-
-
-(* Zadatak 16. b)*)
-(*
-primrec proizvod_zad16 :: "nat \<Rightarrow> real" where
-  "proizvod_zad16 0 = 1"
-| "proizvod_zad16 (Suc n) = proizvod_zad16 n * ( 1 - 4/(2*n + 1)^2) "
-
-lemma prosirivanje_razlomka_zad16:
-  fixes b::real
-  fixes c::real
-  assumes "b \<noteq> 0"
-  shows "1 - c/b = b/b - c/b"
-  using assms
-  by (simp add: diff_divide_distrib)
-
-
-lemma oduzimanje_razlomka:
-  fixes a b c::nat
-  assumes "b \<noteq> 0"
-  shows "a/b - c/b = (real(a) - (c))/b"
-  using assms
-  by (simp add: diff_divide_distrib)
-
-value "proizvod_zad16 2"
-lemma proizvod_zad16_lm:
-  fixes n::nat
-  assumes "n \<ge> 1"
-  shows "proizvod_zad16 n = (1 + 2*n)/(1 - 2*n)"
-proof(induction n)
-  case 0
-  thus ?case by simp
-next
-  case (Suc n)
-  have "proizvod_zad16 (Suc n) = proizvod_zad16 n * ( 1 - 4/(2*n + 1)^2)"
-    by auto
-  also have "... = proizvod_zad16 n * (1 - 4/(4*n^2 + 4*n +1))"
-    by (auto simp add: power2_eq_square)
-  also have "... = proizvod_zad16 n * ((4*n^2 + 4*n +1)/(4*n^2 + 4*n +1) - 4/(4*n^2 + 4*n +1))"
-    by (metis Suc_eq_plus1 Suc_mult_cancel1 add_diff_cancel_left' diff_zero mult.commute
-        mult_zero_right n_not_Suc_n nat_mult_1 of_nat_eq_0_iff  prosirivanje_razlomka_zad16)
-  also have "... = proizvod_zad16 n * ((4*n^2 + 4*n + 1) - real(4))/(4*n^2 + 4*n +1)"
-    using oduzimanje_razlomka Suc
-    by (metis (mono_tags, hide_lams) Suc_1 Suc_eq_plus1
-        diff_divide_distrib distrib_left of_nat_numeral 
-        semiring_normalization_rules(24) times_divide_eq_right)
-  also have "... =  proizvod_zad16 n * ((4*n^2 + 4*n - nat(3))/(4*n^2 + 4*n +1))"
-    using Suc assms
-    sledgehammer
-    by auto
-  qed
-*)
 
 
 (* da se brojevi oblika 2^2^n + 1 (n = 2, 3 , . . . ) završavaju cifrom 7 *)
