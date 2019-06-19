@@ -180,16 +180,6 @@ primrec razlomak_proizvoda_suseda :: "nat \<Rightarrow> real" where
   "razlomak_proizvoda_suseda 0 = 0"
 | "razlomak_proizvoda_suseda (Suc n) = (1::real) / ( Suc n * ((Suc n) + 1)) + razlomak_proizvoda_suseda n"
 
-value "(\<Sum>k\<leftarrow>[1..<Suc 5]. (1::real) / (k * (k + 1)))"
-
-value "[1..<Suc 4] @ [5]"
-
-
-
-term "sum_list (map (\<lambda> k. (1::real) / ((k+1) * (k+2))) [1..<Suc 5])"
-
-
-
 value "razlomak_proizvoda_suseda 2"
 
 thm add_divide_distrib
@@ -200,55 +190,6 @@ lemma sabiranje_razlomaka:
   fixes c::real
   shows "a/b + c/b = (a+c)/b"
   by (simp add: add_divide_distrib)
-
-find_theorems "_ / _ + _ / _ = _ / _"
-
-
-lemma dorada:
-  fixes n::nat
-  assumes "n\<ge>1"
-  shows "(\<Sum>k\<leftarrow>[1..<Suc n]. (1::real) / (k * (k + 1))) = real n / (n + 1)"
-  using assms
-proof(induction n rule: nat_induct_at_least)
-  case base
-  then show ?case by simp
-next
-  case (Suc n)
-  then show ?case 
-  proof-
-    have "(\<Sum>k\<leftarrow>[1..<Suc (Suc n)]. (1::real) / (k * (k + 1))) = 
-    (\<Sum>k\<leftarrow>([1..<Suc n] @ [n+1]). (1::real) / (k * (k + 1)))"
-      by auto
-    also have "... = 
-    (\<Sum>k\<leftarrow>[1..<Suc n]. (1::real) / (k * (k + 1))) + (\<Sum>k\<leftarrow>[n+1]. (1::real) / (k * (k + 1)))"
-      by auto
-    also have "... = 
-    (\<Sum>k\<leftarrow>[1..<Suc n]. (1::real) / (k * (k + 1))) +  (1::real) / ((n+1) * (n+2))"
-      by (auto simp add:field_simps)
-    also have "... = n/(n+1) + 1/((n+1)*(n+2))"
-      using Suc
-      by auto
-    also have "... =(n+2)/(n+2)* n/((n+1)) + 1/((n+1)*(n+2))"
-      by auto
-    also have "... =((n+2)*n)/((n+2)*(n+1)) + 1/((n+1)*(n+2))"
-      by (metis (no_types, lifting) divide_divide_eq_left of_nat_mult times_divide_eq_left)
-    also have "... =((n+2)*n)/((n+2)*(n+1)) + 1/((n+2)*(n+1))"
-      by auto
-    also have "... =(n*n+2*n)/((n+2)*(n+1)) + 1/((n+2)*(n+1))"
-      by auto  
-    also have "... =(n*n+2*n+1)/((n+2)*(n+1))"
-      using sabiranje_razlomaka
-      by (auto simp add: algebra_simps)     
-    also have "... = (n^2 + 2*n + 1)/((n+1)*(n+2))"
-      by (auto simp add: algebra_simps power2_eq_square)
-    also have "... = (n+1)^2/((n+1)*(n+2))"
-      by (auto simp add: algebra_simps power2_eq_square)
-    also have "... = (n+1)/(n+2)"
-      by (smt Suc.hyps divide_divide_eq_right nonzero_mult_div_cancel_left of_nat_1 of_nat_add of_nat_mono of_nat_mult power2_eq_square)
-    finally show ?thesis by auto
-  qed
-qed
-
 
 lemma zbir_razlomka_proizvoda_suseda: 
   fixes n::nat
