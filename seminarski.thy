@@ -6,6 +6,28 @@ primrec suma_prvih :: "nat \<Rightarrow> nat" where
 "suma_prvih 0 = 0"
 | "suma_prvih (Suc n) = suma_prvih n + (n+1)"
 
+
+lemma dorada_prvi_stepen:
+  shows "(\<Sum>k\<leftarrow>[0..<Suc n]. k) = n*(n+1) div 2"
+proof(induction n)
+  case 0
+  then show ?case 
+    by simp
+next
+  case (Suc n)
+  have "(\<Sum>k\<leftarrow>[0..<Suc (Suc n)]. k) = (\<Sum>k\<leftarrow>[0..<Suc n]. k) + Suc n"
+    by simp
+  also have "... = n * ( n + 1 ) div 2 + Suc n"
+    using Suc
+    by simp
+  also have "... = (n * ( n + 1 ) + 2*(Suc n)) div 2"
+    by simp
+  also have "... = (n + 1) * (n+2) div 2"
+    by simp
+  finally show ?case by simp
+qed
+
+
 lemma prvi_stepen:
   shows "suma_prvih n = n*(n+1) div 2"
 proof (induction n)
@@ -31,6 +53,27 @@ qed
 primrec suma_prvih_2 :: "nat \<Rightarrow> nat" where
 "suma_prvih_2 0 = 0"
 | "suma_prvih_2 (Suc n) = suma_prvih_2 n + (n+1)^2"
+
+
+lemma dorada_drugi_stepen:
+  shows "(\<Sum>k\<leftarrow>[0..<Suc n]. k^2) = n*(n+1)*(2*n+1) div 6"
+proof(induction n)
+  case 0
+  then show ?case 
+    by simp
+next
+  case (Suc n)
+  have "(\<Sum>k\<leftarrow>[0..<Suc (Suc n)]. k^2) = (\<Sum>k\<leftarrow>[0..<Suc n]. k^2) + (Suc n)^2"
+    by (auto simp add: power2_eq_square)
+  also have "... = n * ( n + 1 ) * (2*n + 1) div 6 + (Suc n)^2"
+    using Suc
+    by simp
+  also have "... = (n + 1) * (n + 2) * (2 * n + 3) div 6"
+      by (auto simp add: power2_eq_square algebra_simps)
+  also have "... = (n + 1) * (n + 2)*(2 * (n + 1) + 1) div 6"
+    by (auto simp add: algebra_simps)
+  finally show ?case by simp
+qed
 
 lemma drugi_stepen:
   shows "suma_prvih_2 n = n*(n+1)*(2*n+1) div 6"
@@ -59,6 +102,29 @@ qed
 primrec suma_prvih_3 :: "nat \<Rightarrow> nat" where
 "suma_prvih_3 0 = 0"
 | "suma_prvih_3 (Suc n) = suma_prvih_3 n + (n+1)^3"
+
+
+lemma dorada_treci_stepen:
+  shows "(\<Sum>k\<leftarrow>[0..< Suc n]. k^3) = n^2 * (n + 1)^2 div 4"
+proof(induction n)
+case 0
+  then show ?case by simp
+next
+  case (Suc n)
+  have "(\<Sum>k\<leftarrow>[0..< Suc (Suc n)]. k^3) = (\<Sum>k\<leftarrow>[0..< Suc n]. k^3) + (Suc n)^3"
+    by simp
+  also have "... = n^2 * (n + 1)^2 div 4 + (Suc n)^3"
+    using Suc
+    by simp
+  also have "... = n^2 * (n + 1)^2 div 4 + 4 * (n + 1)^3 div 4"
+    by auto
+  also have "... = (n + 1)^2 * (n^2 + 4 * (n + 1)) div 4"
+    by (auto simp add: algebra_simps power3_eq_cube power2_eq_square)
+  also have "... = (n + 1)^2 * (n + 2)^2 div 4"
+    by (auto simp add: algebra_simps power2_eq_square)
+  finally show ?case
+    by simp
+qed
 
 lemma treci_stepen:
   shows "suma_prvih_3 n = n^2*(n+1)^2 div 4"
